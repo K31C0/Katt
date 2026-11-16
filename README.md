@@ -1,58 +1,81 @@
+<div align="center">
+
+<img src="assets/katt-wordmark.png" alt="Katt" width="420" />
+
 # Katt-AI
 
-**A private, security-first AI companion and agent harness I build solo, working toward her
-own small, fast local model.**
+**A local-first desktop AI companion with persistent memory, a living dashboard and an optional Discord presence.**
 
-Katt-AI runs on one Windows PC. A Python core sits behind a localhost-only dashboard in a
-native desktop window. Discord is optional and starts off. Chat, memory and decisions stay on
-the machine unless I approve a send.
+*Built solo and security-first, working toward her own small, fast local model.*
 
-> **This repository is the public front page. The source code is private on purpose.**
-> The working repository holds personal data paths, a private voice corpus and its full commit
-> history. Git keeps everything ever committed, so I publish a fresh, reviewed summary
-> instead of the repository itself. File names below refer to the private repository, and I
-> am glad to walk through any of them live.
+![Python](https://img.shields.io/badge/Python-3.14-3776AB?logo=python&logoColor=white)
+![Tauri](https://img.shields.io/badge/Tauri-2-24C8D8?logo=tauri&logoColor=white)
+![Flask](https://img.shields.io/badge/Flask-3.1-000000?logo=flask&logoColor=white)
+![discord.py](https://img.shields.io/badge/discord.py-2.7-5865F2?logo=discord&logoColor=white)
+![Gemini](https://img.shields.io/badge/Gemini-REST-8E75B2?logo=googlegemini&logoColor=white)
+![Local models](https://img.shields.io/badge/local%20models-loopback%20only-000000?logo=ollama&logoColor=white)
+![Platform](https://img.shields.io/badge/platform-Windows-0078D6?logo=windows&logoColor=white)
+![Tests](https://img.shields.io/badge/tests-90%2B%20suites%20on%20every%20commit-6f3fa0)
+![Source](https://img.shields.io/badge/source-private-lightgrey)
 
-## About me
+[Features](#-features) · [Architecture](#-architecture) · [What it proves](#-what-it-proves) · [Design principles](#-design-principles) · [Roadmap](#-roadmap) · [About me](#-about-me)
 
-- **Kevin** ([K31C0](https://github.com/K31C0))
-- WGU B.S. Cybersecurity (in progress). CompTIA A+, Network+, Security+.
-- Open to IT support, SOC and junior security roles.
+</div>
 
-## At a glance
+---
 
-| | |
-| --- | --- |
-| **Team** | Solo owner-developer directing two AI coding agents |
-| **History** | 430+ commits in the private repository since July 2026 |
-| **Tests** | 90+ test suites; all of them run on every commit |
-| **Stack** | Python 3, Flask, SQLite, a native desktop shell, local models on loopback, cloud model APIs behind a gate |
-| **Rule that shapes everything** | The PC can lose power at any moment, so every feature must survive a kill mid-write |
+Katt lives in a desktop app. A Python core runs behind a localhost **Mission Control** dashboard, and a Tauri/Rust shell gives it a native window. Discord is optional: it starts **OFF** at every boot and connects only when I turn it on. Chat, memory and decisions stay on the machine unless I approve a send.
 
-## Architecture and trust boundaries
+> [!NOTE]
+> **This is the public front page. The source is private on purpose.** The working repository holds personal data paths, a private voice corpus and its full commit history. Git keeps everything ever committed, so I publish a fresh, reviewed summary instead of the repository itself. File names below refer to the private repository, and I am glad to walk through any of them live.
+
+<div align="center">
+
+<img src="assets/opening-preview.png" alt="Katt opening screen with purple pixel lava" width="760" />
+
+<sub>The desktop opening screen. Synthetic preview with an invented readiness state.</sub>
+
+</div>
+
+## ✨ Features
+
+| | Feature | What it does |
+| --- | --- | --- |
+| 💬 | **One reply pipeline** | In-app chat and Discord share the same core, persona and memory. |
+| 🧠 | **Per-person memory** | Facts, private notes and core "self/person" blocks are scoped per person, survive restarts, and have owner reset controls. A wipe is complete and crash-safe. |
+| 🕰️ | **Time and mood awareness** | Katt knows how long it has been since you talked, and her mood persists across power cycles. |
+| 🎛️ | **Model choices and Compute Dial** | Per-purpose model preferences, pinned local routes and one switch for Auto, Manual or Local-only. **Auto Game Mode** yields background compute while I game. |
+| 💸 | **Spend ledger** | Hard monthly caps. Paid attempts reserve budget before sending; unknown usage keeps its reservation. |
+| 🌙 | **Dream cycle** | Chunked background memory consolidation, run on the idle local route. |
+| 📊 | **Mission Control** | Localhost dashboard: chat, vitals, charts, errors, archives, Progress, Study, Models and connection controls. |
+| 📚 | **Study companion** | Course organization, quizzes, mastery tracking and readiness views, with model and budget controls. In progress: my own pilot comes before switch-on. |
+| 🟣 | **Pixel-purple opening** | Pixel Katt artwork over slow purple pixel lava, a clear Enter action and grouped recovery controls. |
+| 💭 | **Presence** | Event-driven thought bubbles and an owner-triggered narrated status report with a cooldown and a facts-only fallback. |
+| 🛟 | **Crash recovery** | Recovery screen, diagnostic safe mode, owned-process checks and a durable restart allowance. |
+| 🔔 | **Reminders** | Windows notifications, at most one toast per reminder, generic text on the lock screen. |
+| 🔐 | **Encrypted storage** | AES-256-GCM sealing for chat-derived files under a DPAPI-wrapped keyring, with a journaled migration that can roll back. Built and independently reviewed; rollout pending. |
+
+## 🧩 Architecture
 
 ```mermaid
-flowchart LR
-  subgraph PC["One Windows PC (trust boundary)"]
-    UI["Desktop window"] -->|"127.0.0.1 only, Host and Origin checked"| DASH["Dashboard (Flask)"]
-    DASH <-->|"file bridges, atomic writes"| CORE["Python core: one reply pipeline"]
-    CORE --> MEM[("Memory: SQLite and JSON, AES-256-GCM sealing")]
-    CORE --> LOCAL["Local models: loopback only, pinned by hash"]
-    CORE --> GATE{"Outbound gate: spend ledger, Local-only switch, credential hold on new lanes"}
-  end
-  GATE -->|"only what passes"| CLOUD["Cloud model APIs"]
-  DISCORD["Discord (optional, starts off)"] <--> CORE
+flowchart TD
+    Shell["🖥️ Tauri / Rust shell<br/>native window"] --> Dash
+    Dash["📊 Mission Control<br/>Flask + vanilla JS · 127.0.0.1 only<br/>Host and Origin checked on every write"] <-->|file-based bridges, atomic writes| Core
+    Core["🐍 Python / asyncio core<br/>reply pipeline · memory · routines"]
+    Core -->|optional, OFF at boot| Discord["💬 discord.py gateway"]
+    Core --> Router{"🎛️ Compute Dial<br/>model routes · spend ledger<br/>Local-only switch"}
+    Router -->|replies, paid tier| Gemini["☁️ Cloud model APIs"]
+    Router -->|local replies · dream · bulk| Local["🦙 Local models<br/>loopback only · pinned by hash"]
+    Core --> Store[("🗄️ SQLite archive · JSON state<br/>AES-256-GCM sealing (built, not yet on)")]
 ```
 
-- **Nothing listens beyond loopback.** The dashboard and the local model server bind
-  127.0.0.1.
-- **Cloud calls are gated.** Every cloud call reserves budget in a spend ledger first, and a
-  Local-only switch is checked again before each cloud attempt. The trial lane and the new
-  cloud lanes also pass a credential detector that holds secrets before a send.
-- **The model never acts alone.** File requests from the model wait for my approve or reject,
-  bound to a content hash.
+- **Bot and dashboard** talk through atomic, file-based bridges, so either side can crash without corrupting the other.
+- **Nothing listens beyond loopback.** The dashboard and the local model server bind 127.0.0.1.
+- **Cloud calls are gated.** Every cloud call reserves budget in a spend ledger first, and a Local-only switch is checked again before each cloud attempt. The trial lane and the new cloud lanes also pass a credential detector that holds secrets before a send.
+- **Process identity checks** confirm the exact script and process generation before Start, Stop or Restart. An uncertain match is a refusal, never a kill.
+- **The model never acts alone.** File requests from the model wait for my approve or reject, bound to a content hash.
 
-## What it proves
+## 🔐 What it proves
 
 Each row is one interview story: the problem, what I built, the result.
 
@@ -65,33 +88,48 @@ Each row is one interview story: the problem, what I built, the result.
 | **LLM application security** (OWASP Top 10 for LLM Applications) | **Prompt injection:** stored chat lines are neutralized so text cannot forge a speaker label. **Sensitive data disclosure:** a credential detector holds secrets before any send on the trial cloud lane, and the next reply lane is built on it (not yet switched on). **Excessive agency:** file requests from the model wait for my approve or reject, bound to a content hash. **Unbounded consumption:** every paid call reserves budget in a spend ledger first. | `src/katt_memory.py`, `src/data_lanes.py`, `src/katt_folder.py`, `src/model_harness.py`, `src/openrouter_adapter.py` and their test suites | Live |
 | **Measured engineering** | I measure before I decide. A local-model bake-off picked the fast model on numbers (139 tokens a second, 1.26 s median reply, 12 of 12 checks). A speed bench found a 107M-parameter layout that holds 1,405 tokens a second on my GPU before any training money was spent. A 200-item routing test showed one-letter decisions are 2.4x faster than JSON (64 vs 152 ms) but 14 points less accurate (66.5% vs 80.5%), so the slower path stays for now. | `src/llama_server.py`, `scripts/model_lab_s0.py`, `scripts/model_lab_s4.py`, `tests/test_katt_decides.py` | Benches done; a 107M base model is pretrained; distillation and fine-tuning are next |
 
-## How I build with AI
+## 🧱 Design principles
 
-I direct two AI coding agents (Claude and Codex). I own the architecture, the security rules,
-the reviews and the final call. The agents work under written rules: one builds, the other
-reviews, and a guard enforces the rules at commit time. Tests gate every commit. Privacy
-sends, spend, protected-state runs and any public release need my approval.
+| Principle | In practice |
+| --- | --- |
+| **Local-first, private by default** | The dashboard binds localhost only and every write is Host and Origin checked. Remote access would need its own authenticated design. |
+| **No surprise spend** | No extra model calls in the reply or incident hot paths without my approval. Paid calls pass the ledger first. |
+| **Power-cut safe** | Atomic writes with Windows file-lock retry, idempotent loops, durable state. The host gets power-cycled constantly. |
+| **Fail closed** | Unknown process, unpinned model or malformed usage means *no*, not *maybe*. |
+| **Guarded commits** | A pre-commit guard blocks oversized deletions, protected paths and secrets; the commit hook then runs every suite. |
 
-This is AI governance in practice: a policy, a control that enforces it, and evidence that the
-control ran.
+> [!CAUTION]
+> Git is not a backup of Katt's memory, and it is not a safe way to share her either. Corpus, memories, keys, databases, logs and backups never enter a repository I publish.
 
-## Roadmap
+## 🤝 How it's built
+
+One owner-developer holds the architecture, the security rules and every final call. Two AI coding agents (Claude and Codex) pair under written rules: one builds, the other independently reviews, and a guard enforces the rules at commit time. Tests gate every commit. Privacy sends, spend, protected-state runs and any public release need my approval.
+
+This is AI governance in practice: a policy, a control that enforces it, and evidence that the control ran.
+
+| | |
+| --- | --- |
+| **History** | 430+ commits in the private repository since July 2026 |
+| **Tests** | 90+ test suites; all of them run on every commit |
+| **Stack** | Python 3, Flask, SQLite, Tauri/Rust shell, local models on loopback, cloud model APIs behind a gate |
+
+## 🚀 Roadmap
 
 | Shipped | Building | Research |
 | --- | --- | --- |
-| Desktop app with a localhost dashboard and one reply pipeline for app and Discord | Tools on the local route: read my schedule, set reminders | **Katt 0.1:** the project's own small model, about 107M parameters, target 1,000 tokens a second beside a game |
+| Desktop app with a localhost dashboard and one reply pipeline for app and Discord | Tools on the local route: read my schedule, set reminders | **Katt 0.1:** her own small model, about 107M parameters, target 1,000 tokens a second beside a game |
 | Per-person memory that survives restarts | Local decisions before any cloud call (trial against a gold set) | Katt 0.2: taught by an openly licensed teacher model |
 | Spend ledger with hard monthly caps | Encryption at rest rollout (built and reviewed) | Katt 0.3 and later: one measured experiment at a time |
 | Crash consistency: state survives a kill or power loss at any moment | A verifier that accepts a model's claim only when it re-computes against evidence | A fixed personal benchmark that must not regress |
 | Local model routes pinned by hash, loopback only | | |
 | Reminders with Windows notifications | | |
 
-Third-party models (Qwen, Gemini) serve as engines, teachers and evaluation baselines. The
-project's own model is trained from scratch on public, license-carded data.
+Third-party models (Qwen, Gemini) serve as engines, teachers and evaluation baselines. Katt's own model is trained from scratch on public, license-carded data.
 
-## What works (curated receipts)
+## 🧪 What works
 
-Format: date, what works, the test or script that shows it.
+<details>
+<summary><b>Curated receipts: date, what works, the test or script that shows it</b></summary>
 
 - **2026-11-14 - Security lab, host side:** a broker refuses tools off an allowlist, malformed output, unsafe paths and any VM setup with a way back to the PC; nothing native runs yet. `tests/test_seclab.py`
 - **2026-11-14 - A memory wipe is complete and crash-safe:** short conversation scenes are recalled only in their own room, and a wipe removes them too, even when power is lost mid-wipe. `tests/test_memory_durability.py`
@@ -114,6 +152,12 @@ Format: date, what works, the test or script that shows it.
 - **2026-11-07 - Tests cannot touch real data:** every suite runs on an isolated copy, and a run fails if it writes into runtime data. `tests/run_all.py`
 - **2026-11-07 - Secret scan at commit time:** the commit check tests exactly what is committed and scans staged changes for secrets. `tests/test_guard.py`
 
-## License
+</details>
 
-Copyright (c) 2026 Kevin (K31C0). All rights reserved. This repository is documentation only.
+## 👋 About me
+
+- **Kevin** ([K31C0](https://github.com/K31C0))
+- WGU B.S. Cybersecurity (in progress). CompTIA A+, Network+, Security+.
+- Open to IT support, SOC and junior security roles.
+
+<div align="center"><sub>Personal project · Copyright (c) 2026 Kevin (K31C0) · all rights reserved · documentation only</sub></div>
