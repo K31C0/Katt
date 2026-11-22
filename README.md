@@ -27,7 +27,7 @@
 Katt lives in a desktop app. A Python core runs behind a localhost **Mission Control** dashboard, and a Tauri/Rust shell gives it a native window. Discord is optional: it starts **OFF** at every boot and connects only when I turn it on. Chat, memory and decisions stay on the machine unless I approve a send.
 
 > [!NOTE]
-> **This is the public front page. The source is private on purpose.** The working repository holds personal data paths, a private voice corpus and its full commit history. Git keeps everything ever committed, so I publish a fresh, reviewed summary instead of the repository itself. File names below refer to the private repository, and I am glad to walk through any of them live.
+> **This is the public front page. The source is private on purpose.** The working repository holds personal data paths, a private voice corpus and its full commit history. Git keeps everything ever committed, so I share a reviewed summary here instead of the repository itself. File names below refer to the private repository. I'm happy to talk about what I built and what I learned along the way.
 
 <div align="center">
 
