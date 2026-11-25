@@ -60,6 +60,8 @@ Katt lives in a desktop app. A Python core runs behind a localhost **Mission Con
 
 **Progress, read 2026-11-25 from my own build tracker:** 715 of 1,249 planned build pieces are done. Of 183 planned features, 67 are fully built, 48 of those have passed an independent review, and 14 have been checked one by one in the running app so far. 87 are ideas I have not started. In the three areas I am finishing first: brains (model choice, speed, spending) 157 of 181 pieces, memory 40 of 47, and testing 42 of 64.
 
+What I measured along the way, including what failed: [lab notes](LAB_NOTES.md).
+
 ## ✨ Features
 
 | | Feature | What it does |
