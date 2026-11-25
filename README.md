@@ -67,7 +67,7 @@ What I measured along the way, including what failed: [lab notes](LAB_NOTES.md).
 | | Feature | What it does |
 | --- | --- | --- |
 | 💬 | **One reply pipeline** | In-app chat and Discord share the same core, persona and memory. |
-| 🧠 | **Per-person memory** | Facts, private notes and core "self/person" blocks are scoped per person, survive restarts, and have owner reset controls. A wipe is complete and crash-safe. |
+| 🧠 | **Per-person memory** | Facts, private notes and core "self/person" blocks are scoped per person, survive restarts, and have owner reset controls. A memory wipe is crash-safe. |
 | 🕰️ | **Time and mood awareness** | Katt knows how long it has been since you talked, and her mood persists across power cycles. |
 | 🎛️ | **Model choices and Compute Dial** | Per-purpose model preferences, pinned local routes and one switch for Auto, Manual or Local-only. **Auto Game Mode** yields background compute while I game. |
 | 💸 | **Spend ledger** | Hard monthly caps. Paid attempts reserve budget before sending; unknown usage keeps its reservation. |
@@ -157,7 +157,7 @@ Third-party models (Qwen, Gemini) serve as engines, teachers and evaluation base
 <summary><b>Curated receipts: date, what works, the test or script that shows it</b></summary>
 
 - **2026-11-14 - Security lab, host side:** a broker refuses tools off an allowlist, malformed output, unsafe paths and any VM setup with a way back to the PC; nothing native runs yet. `tests/test_seclab.py`
-- **2026-11-14 - A memory wipe is complete and crash-safe:** short conversation scenes are recalled only in their own room, and a wipe removes them too, even when power is lost mid-wipe. `tests/test_memory_durability.py`
+- **2026-11-14 - A memory wipe is crash-safe:** short conversation scenes are recalled only in their own room, and a wipe removes them too, even when power is lost mid-wipe. `tests/test_memory_durability.py`
 - **2026-11-14 - No lost reply:** when a bigger local model refuses or cannot be reached, the reply steps down to the smaller local model, on the PC, inside a two-attempt limit. `tests/test_model_harness.py`
 - **2026-11-12 - Model mode and per-model levels:** one control sets Auto, Manual or Local-only, Local-only is checked again before every cloud attempt, and each model has its own temperature, reply length, context and reasoning levels. `tests/test_model_harness.py`
 - **2026-11-12 - Live checks on a test copy:** a second instance boots offline in an empty temp folder and answers synthetic messages through the real reply path at $0, without touching real chat or memory. `scripts/live_check.py`, `tests/test_live_check.py`
