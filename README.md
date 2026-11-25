@@ -24,7 +24,7 @@
 
 ---
 
-Katt lives in a desktop app. A Python core runs behind a localhost **Mission Control** dashboard, and a Tauri/Rust shell gives it a native window. Discord is optional: it starts **OFF** at every boot and connects only when I turn it on. Chat, memory and decisions stay on the machine unless I approve a send.
+Katt lives in a desktop app. A Python core runs behind a localhost **Mission Control** dashboard, and a Tauri/Rust shell gives it a native window. Discord is optional: it starts **OFF** at every boot and connects only when I turn it on. She is my own private assistant, not a public bot. Chat, memory and decisions stay on the machine unless I approve a send.
 
 > [!NOTE]
 > **This is the public front page. The source is private on purpose.** The working repository holds personal data paths, a private voice corpus and its full commit history. Git keeps everything ever committed, so I share a reviewed summary here instead of the repository itself. File names below refer to the private repository. I'm happy to talk about what I built and what I learned along the way.
@@ -36,6 +36,29 @@ Katt lives in a desktop app. A Python core runs behind a localhost **Mission Con
 <sub>The desktop opening screen. Synthetic preview with an invented readiness state.</sub>
 
 </div>
+
+## 🚧 Status
+
+**Status: under active development.** This is a working personal project, not a finished product. "Done" here means built and tested. It does not mean checked in daily use: each finished feature still gets its own check in the running app.
+
+**Done**
+
+- A desktop app with a local dashboard, and one reply path shared by the app and Discord
+- Memory that survives restarts and forgets on command
+- Choosing between local and cloud models, with hard monthly spending caps
+- Reminders and recovery after a crash or a power cut
+- Tools for building and checking her: tests on every commit and lab measurements
+
+**Being built now**
+
+- Tools on the local route, such as reading my schedule and setting reminders
+- Her sense of continuity: carrying mood and context from one day to the next
+- Tests that check she still sounds like Katt
+- The study companion (my own trial comes first)
+- Her own small model, still research
+- Security hardening is ongoing
+
+**Progress, read 2026-11-25 from my own build tracker:** 715 of 1,249 planned build pieces are done. Of 183 planned features, 67 are fully built, 48 of those have passed an independent review, and 14 have been checked one by one in the running app so far. 87 are ideas I have not started. In the three areas I am finishing first: brains (model choice, speed, spending) 157 of 181 pieces, memory 40 of 47, and testing 42 of 64.
 
 ## ✨ Features
 
@@ -86,7 +109,7 @@ Each row is one interview story: the problem, what I built, the result.
 | **Secure change control** | A pre-commit guard blocks mass deletions, protected paths, deleted files and secrets in staged changes. The commit hook then runs every test suite on an isolated copy of what is staged, with a detector that fails the run if a test writes into real runtime data. | `scripts/guard.py`, `tests/test_guard.py`, `tests/run_all.py`, `tests/test_run_all.py` | Live on every commit |
 | **Resilience and recovery** | Built for a host that can lose power at any moment: atomic writes, idempotent loops, a complete copy of a damaged file before anything replaces it, and simulated power cuts after every file operation in the migration tool. | `tests/test_memory_durability.py`, `tests/test_manage_sealed_store.py`, `src/schedule_core.py`, `tests/test_shutdown_bridge.py` | Live |
 | **LLM application security** (OWASP Top 10 for LLM Applications) | **Prompt injection:** stored chat lines are neutralized so text cannot forge a speaker label. **Sensitive data disclosure:** a credential detector holds secrets before any send on the trial cloud lane, and the next reply lane is built on it (not yet switched on). **Excessive agency:** file requests from the model wait for my approve or reject, bound to a content hash. **Unbounded consumption:** every paid call reserves budget in a spend ledger first. | `src/katt_memory.py`, `src/data_lanes.py`, `src/katt_folder.py`, `src/model_harness.py`, `src/openrouter_adapter.py` and their test suites | Live |
-| **Measured engineering** | I measure before I decide. A bake-off picked her local model on measured speed and checks, not on hype. One engine setting made her local replies about 28% faster (median 1.20 s to 0.88 s), and no quality check got worse. A routing test showed a quick one-letter answer is 2.4x faster than JSON but 14 points less accurate, so the slower, more accurate path stays for now. | `src/llama_server.py`, `tests/test_katt_decides.py` | Tests done; the faster setting is merged |
+| **Measured engineering** | I measure before I decide. A bake-off picked her local model on measured speed and checks, not on hype. In two lab tests, one engine setting cut her local reply time by 17% and 28% (in the second, median 1.20 s to 0.88 s). The raw timings showed two causes: the engine reads a long prompt in bigger batches, and on about half the turns it reuses the part of her prompt that repeats. The checks I ran (empty replies, leaked tags, crisis help-pointing) did not get worse. Most replies changed wording, so a quality check and a live measurement come before I call it done (see [Status](#-status): built and tested is not the same as done). A routing test showed a quick one-letter answer is 2.4x faster than JSON but 14 points less accurate, so the slower, more accurate path stays for now. | `src/llama_server.py`, `tests/test_katt_decides.py` | Lab tests done; the setting is merged, live measurement pending |
 
 ## 🧱 Design principles
 
